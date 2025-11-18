@@ -50,6 +50,10 @@ export default function RootLayout({
                     <h1 className="font-semibold ml-1.5">Symmetry</h1>
                   </div>
                   {/* buttons */}
+                  <Button variant="outline">
+                    <LogInIcon />
+                    Sign In
+                  </Button>
                 </div>
                 <Separator className="my-2" />
                 <div className="flex-1 overflow-hidden mt-2">{children}</div>

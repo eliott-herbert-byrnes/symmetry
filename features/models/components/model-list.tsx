@@ -1,4 +1,5 @@
 "use client";
+"use no memo";
 
 import * as React from "react";
 import {
@@ -23,7 +24,6 @@ import {
   Search,
   MoreVertical,
 } from "lucide-react";
-import { z } from "zod";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -62,10 +62,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ProcessDeleteButton } from "./process-delete-button";
 
-
-type Model = {
+export type Model = {
   id: string;
   name: string;
   type: string;
@@ -76,7 +74,7 @@ type Model = {
   unit_cell: string;
   unit_cell_angles: string;
   description: string;
-  createdAt: string;
+  created_at: string;
 };
 
 function TableCellViewer({ item }: { item: Model }) {
@@ -90,40 +88,75 @@ function TableCellViewer({ item }: { item: Model }) {
             variant="link"
             className="text-foreground w-fit px-0 text-left"
           >
-            {item.title}
+            {item.name}
           </Button>
         </SheetTrigger>
         <SheetContent side={isMobile ? "bottom" : "right"}>
-          <SheetHeader className="gap-1">
-            <SheetTitle>{item.title}</SheetTitle>
-            <SheetDescription>Error Report Details</SheetDescription>
+          <SheetHeader className="gap-1 mt-4">
+            <SheetTitle>{item.name}</SheetTitle>
+            <SheetDescription>Model Details</SheetDescription>
           </SheetHeader>
+            <Separator />
           <div className="flex flex-col gap-4 overflow-y-auto py-4 text-sm mx-4">
             <div className="flex flex-col gap-2">
-              <Label className="font-semibold">Status</Label>
-              <Badge variant="outline" className="w-fit">
-                Published
-              </Badge>
+              <Label className="font-semibold">Type</Label>
+              <p className="text-muted-foreground">{item.type}</p>
+            </div>
+
+            <Separator />
+
+            <div className="flex flex-col gap-2">
+              <Label className="font-semibold">Formula</Label>
+              <p className="text-muted-foreground">{item.formula}</p>
+            </div>
+
+            <Separator />
+
+            <div className="flex flex-col gap-2">
+              <Label className="font-semibold">Molecular Weight</Label>
+              <p className="text-muted-foreground">{item.molecular_weight}</p>
+            </div>
+
+            <Separator />
+
+            <div className="flex flex-col gap-2">
+              <Label className="font-semibold">Symmetry</Label>
+              <p className="text-muted-foreground whitespace-pre-wrap">
+                {item.symmetry}
+              </p>
+            </div>
+
+            <Separator />
+
+            <div className="flex flex-col gap-2">
+              <Label className="font-semibold">Space Group</Label>
+              <p className="text-muted-foreground whitespace-pre-wrap">
+                {item.space_group}
+              </p>
+            </div>
+
+            <Separator />
+
+            <div className="flex flex-col gap-2">
+              <Label className="font-semibold">Unit Cell</Label>
+              <p className="text-muted-foreground whitespace-pre-wrap">
+                {item.unit_cell}
+              </p>
+            </div>
+
+            <Separator />
+
+            <div className="flex flex-col gap-2">
+              <Label className="font-semibold">Unit Cell Angles</Label>
+              <p className="text-muted-foreground whitespace-pre-wrap">
+                {item.unit_cell_angles}
+              </p>
             </div>
 
             <Separator />
 
             <div className="flex flex-col gap-2">
               <Label className="font-semibold">Description</Label>
-              <p className="text-muted-foreground">{item.description}</p>
-            </div>
-
-            <Separator />
-
-            <div className="flex flex-col gap-2">
-              <Label className="font-semibold">Category</Label>
-              <p className="text-muted-foreground">{item.category?.name}</p>
-            </div>
-
-            <Separator />
-
-            <div className="flex flex-col gap-2">
-              <Label className="font-semibold">Report Body</Label>
               <p className="text-muted-foreground whitespace-pre-wrap">
                 {item.description}
               </p>
@@ -134,7 +167,7 @@ function TableCellViewer({ item }: { item: Model }) {
             <div className="flex flex-col gap-2">
               <Label className="font-semibold">Created At</Label>
               <p className="text-muted-foreground">
-                {new Date(item.createdAt).toLocaleDateString("en-US", {
+                {new Date(item.created_at).toLocaleDateString("en-US", {
                   year: "numeric",
                   month: "long",
                   day: "numeric",
@@ -172,7 +205,7 @@ export function ModelList({
     pageSize: 10,
   });
 
-  const columns: ColumnDef<Process>[] = [
+  const columns: ColumnDef<Model>[] = [
     {
       id: "select",
       header: ({ table }) => (
@@ -202,30 +235,30 @@ export function ModelList({
       enableHiding: false,
     },
     {
-      accessorKey: "title",
-      header: "Title",
+      accessorKey: "name",
+      header: "Name",
       cell: ({ row }) => {
         return <TableCellViewer item={row.original} />;
       },
       enableHiding: false,
     },
     {
-      accessorKey: "category",
-      header: "Category",
+      accessorKey: "type",
+      header: "Type",
       cell: ({ row }) => (
         <div className="w-32">
           <Badge variant="outline" className="text-muted-foreground px-1.5">
-            {row.original.category?.name}
+            {row.original.type}
           </Badge>
         </div>
       ),
     },
     {
-      accessorKey: "createdAt",
+      accessorKey: "created_at",
       header: "Created At",
       cell: ({ row }) => (
         <div className="text-sm text-muted-foreground">
-          {new Date(row.original.createdAt).toLocaleDateString("en-US", {
+          {new Date(row.original.created_at).toLocaleDateString("en-US", {
             month: "short",
             day: "numeric",
             year: "numeric",
@@ -249,7 +282,7 @@ export function ModelList({
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-40">
             <DropdownMenuItem asChild>
-              <ProcessDeleteButton processId={row.original.id} />
+              {/* <ModelDeleteButton modelId={row.original.id} /> */}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -257,6 +290,7 @@ export function ModelList({
     },
   ];
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data: initialData,
     columns,
@@ -288,12 +322,12 @@ export function ModelList({
         <div className="relative flex-1 max-w-sm">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
-            placeholder="Search by process name..."
+            placeholder="Search by model name..."
             value={
-              (table.getColumn("title")?.getFilterValue() as string) ?? ""
+              (table.getColumn("name")?.getFilterValue() as string) ?? ""
             }
             onChange={(event) =>
-              table.getColumn("title")?.setFilterValue(event.target.value)
+              table.getColumn("name")?.setFilterValue(event.target.value)
             }
             className="pl-10"
           />
@@ -343,7 +377,7 @@ export function ModelList({
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  No processes found.
+                  No models found.
                 </TableCell>
               </TableRow>
             )}

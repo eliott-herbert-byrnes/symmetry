@@ -22,14 +22,14 @@ const CPK_COLORS: { [key: string]: number } = {
   Ca: 0x3dff00, // Bright green
 };
 
-function MoleculeModel({ url }: { url: string }) {
+function MoleculeModel({ url }: { url?: string }) {
   const groupRef = useRef<THREE.Group>(null);
   const [atoms, setAtoms] = useState<THREE.Group | null>(null);
 
   useEffect(() => {
     const loader = new PDBLoader();
     loader.load(
-      url,
+      url || "/diazene.pdb",
       (pdb) => {
         const group = new THREE.Group();
 
@@ -75,10 +75,8 @@ function MoleculeModel({ url }: { url: string }) {
   return atoms ? <primitive object={atoms} ref={groupRef} /> : null;
 }
 
-export default function ModelViewer() {
-  const [pdbFile, setPdbFile] = useState(
-    "/diazene.pdb"
-  );
+export default function ModelViewer({ url }: { url?: string }) {
+  const pdbFile = url || "/diazene.pdb";
 
   return (
     <Card className="bg-transparent h-full w-full">
