@@ -13,10 +13,10 @@ import { Separator } from "@/components/ui/separator";
 export default function ControlPanel() {
   return (
     <Card>
-      <CardContent>
+      <CardContent className="h-full overflow-y-auto p-4">
         <Select>
           <SelectTrigger className="w-full">
-            <SelectValue placeholder="Select a model" />
+            <SelectValue placeholder="Allene" />
           </SelectTrigger>
           <SelectContent>
             <SelectGroup>

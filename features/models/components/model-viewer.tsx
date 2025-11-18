@@ -53,7 +53,7 @@ function MoleculeModel({ url }: { url: string }) {
           const atomMesh = new THREE.Mesh(atomGeometry, material);
           atomMesh.position.set(atom[0], atom[1], atom[2]);
 
-          const scale = element === "H" ? 0.5 : 1.0;
+          const scale = element === "H" ? 0.5 : 0.5;
           atomMesh.scale.setScalar(scale);
 
           group.add(atomMesh);
@@ -77,12 +77,12 @@ function MoleculeModel({ url }: { url: string }) {
 
 export default function ModelViewer() {
   const [pdbFile, setPdbFile] = useState(
-    "https://files.rcsb.org/download/1CRN.pdb"
+    "/diazene.pdb"
   );
 
   return (
     <Card className="bg-transparent h-full w-full">
-      <Canvas camera={{ position: [0, 0, 90], fov: 45 }}>
+      <Canvas camera={{ position: [0, 0, 90], fov: 10 }}>
         <ambientLight intensity={0.3} />
         <directionalLight position={[10, 10, 10]} intensity={0.8} />
         <directionalLight position={[-10, -10, -10]} intensity={0.4} />

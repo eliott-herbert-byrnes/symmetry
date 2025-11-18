@@ -5,11 +5,12 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { ThemeSwitcher } from "./theme/theme-switcher";
 import { Button } from "./ui/button";
 import { Fragment } from "react/jsx-runtime";
+import { homePath } from "@/app/paths";
 
   const items = [
     {
       title: "Home",
-      url: '/',
+      url: homePath(),
       icon: Home,
       separator: true,
     },
