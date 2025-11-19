@@ -1,4 +1,4 @@
-import { supabase } from "@/lib/supabaseClient";
+import { supabase } from "@/lib/supabase/client";
 import ControlPanel from "@/features/control-panel/components/control-panel";
 import ModelViewer from "@/features/models/components/model-viewer";
 

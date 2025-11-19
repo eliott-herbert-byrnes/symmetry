@@ -11,6 +11,8 @@ import { LogInIcon, LogOutIcon, Share2Icon } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { AppSidebar } from "@/components/app-sidebar";
 import { ThemeProvider } from "@/components/theme/theme-provider";
+import Link from "next/link";
+import { signInPath } from "./paths";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -50,9 +52,11 @@ export default function RootLayout({
                     <h1 className="font-semibold ml-1.5">Symmetry</h1>
                   </div>
                   {/* buttons */}
-                  <Button variant="outline">
-                    <LogInIcon />
-                    Sign In
+                  <Button variant="outline" asChild>
+                    <Link href={signInPath()}>
+                      <LogInIcon />
+                      Sign In
+                    </Link>
                   </Button>
                 </div>
                 <Separator className="my-2" />

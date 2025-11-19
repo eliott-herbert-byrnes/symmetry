@@ -1,9 +1,8 @@
-import { supabase } from "@/lib/supabaseClient";
+import { supabase } from "@/lib/supabase/client";
 import { Suspense } from "react";
 import { SkeletonList } from "@/components/skeleton-list";
 import { Heading } from "@/components/heading";
 import { Model, ModelList } from "@/features/models/components/model-list";
-import { ThemeDebug } from "@/components/theme-debug";
 
 type ModelPageProps = {
   searchParams: Promise<{
