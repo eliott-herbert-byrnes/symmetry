@@ -1,4 +1,4 @@
-import { Box, ChevronUp, Home, Link, User2, Waypoints } from "lucide-react";
+import { Box, ChevronUp, Home, User2, Waypoints } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -18,9 +18,11 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { ThemeSwitcher } from "./theme/theme-switcher";
-import { Button } from "./ui/button";
 import { Fragment } from "react/jsx-runtime";
-import { homePath, modelsPath } from "@/app/paths";
+import { homePath, modelsPath, signInPath } from "@/app/paths";
+import { getProfile, isAdmin } from "@/lib/auth";
+import { cn } from "@/lib/utils";
+import { redirect } from "next/navigation";
 
 const items = [
   {
@@ -33,20 +35,30 @@ const items = [
     title: "Models",
     url: modelsPath(),
     icon: Box,
+    isAdmin: false,
   },
   {
     title: "Userbase",
     url: "/",
     icon: User2,
+    isAdmin: true,
   },
   {
     title: "Invite",
     url: "/",
     icon: Box,
+    isAdmin: true,
   },
 ];
 
 export async function AppSidebar() {
+  const profile = await getProfile();
+  if (!profile) {
+    redirect(signInPath());
+  }
+
+  const isAdminUser = isAdmin(profile);
+
   return (
     <Sidebar collapsible="icon" variant="inset">
       <SidebarContent>
@@ -65,7 +77,7 @@ export async function AppSidebar() {
                   <Fragment key={item.title}>
                     <SidebarMenuItem
                       key={item.title}
-                      //   className={cn(item.isAdmin && !isAdmin && "hidden")}
+                      className={cn(item.isAdmin && !isAdminUser && "hidden")}
                     >
                       <SidebarMenuButton asChild>
                         <a href={item.url}>
@@ -79,7 +91,7 @@ export async function AppSidebar() {
                 ) : (
                   <SidebarMenuItem
                     key={item.title}
-                    // className={cn(item.isAdmin && !isAdmin && "hidden")}
+                    className={cn(item.isAdmin && !isAdminUser && "hidden")}
                   >
                     <SidebarMenuButton asChild>
                       <a href={item.url}>
@@ -100,66 +112,13 @@ export async function AppSidebar() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton>
-                  <User2 /> Demo User
+                  <User2 /> {profile?.profile?.full_name ?? "Unknown"}
                   <ChevronUp className="ml-auto" />
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
-              <DropdownMenuContent
-                side="top"
-                className="w-[--radix-popper-anchor-width]"
-              >
+              <DropdownMenuContent side="top" className="">
                 <DropdownMenuItem>
                   <ThemeSwitcher />
-                </DropdownMenuItem>
-                <Separator />
-                <DropdownMenuItem>
-                  <Button
-                    variant="ghost"
-                    className="flex flex-row justify-start w-full h-6"
-                  >
-                    <Link
-                      href="/"
-                      className="text-sm font-normal cursor-default"
-                    >
-                      Support
-                    </Link>
-                  </Button>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Button
-                    variant="ghost"
-                    className="flex flex-row justify-start w-full h-6"
-                  >
-                    <Link
-                      href="/"
-                      className="text-sm font-normal cursor-default"
-                    >
-                      Documentation
-                    </Link>
-                  </Button>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Button
-                    variant="ghost"
-                    className="flex flex-row justify-start w-full h-6"
-                  >
-                    <Link
-                      href="/"
-                      className="text-sm font-normal cursor-default"
-                    >
-                      Feedback
-                    </Link>
-                  </Button>
-                </DropdownMenuItem>
-                <Separator />
-                <DropdownMenuItem>
-                  <Button
-                    //   onClick={signOutAction}
-                    variant="ghost"
-                    className="flex flex-row justify-start w-full h-6"
-                  >
-                    <p className="text-sm font-normal">Logout</p>
-                  </Button>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

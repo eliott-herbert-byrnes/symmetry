@@ -3,6 +3,10 @@ import { Suspense } from "react";
 import { SkeletonList } from "@/components/skeleton-list";
 import { Heading } from "@/components/heading";
 import { Model, ModelList } from "@/features/models/components/model-list";
+import { getProfile, isAdmin } from "@/lib/auth";
+import { redirect } from "next/navigation";
+import { signInPath } from "../paths";
+import { ModelAddButton } from "@/features/models/components/model-add-button";
 
 type ModelPageProps = {
   searchParams: Promise<{
@@ -12,34 +16,39 @@ type ModelPageProps = {
 };
 
 const ModelsPage = async ({ searchParams }: ModelPageProps) => {
+  const profile = await getProfile();
+  if (!profile) {
+    redirect(signInPath());
+  }
 
-const params = await searchParams;
-const search = params.search;
-const page = params.page ? parseInt(params.page, 10) : 1;
-const limit = 10;
-const offset = (page - 1) * limit;
+  const isAdminUser = isAdmin(profile);
 
-let query = supabase.from("models").select("*");
+  const params = await searchParams;
+  const search = params.search;
+  const page = params.page ? parseInt(params.page, 10) : 1;
+  const limit = 10;
+  const offset = (page - 1) * limit;
 
-if (search) {
+  let query = supabase.from("models").select("*");
+
+  if (search) {
     query = query.ilike("name", `%${search}%`);
-}
+  }
 
-const { data: models} = await query.range(offset, offset + limit - 1);
-return (
+  const { data: models } = await query.range(offset, offset + limit - 1);
+
+  return (
     <>
-    <Heading
-      title="Modelbase"
-      description="View and manage models for this application"
-    />
-    <Suspense fallback={<SkeletonList />} key={search}>
-      <ModelList 
-        data={models ?? [] as Model[]} 
+      <Heading
+        title="Modelbase"
+        description="View and manage models for this application"
+        actions={isAdminUser ? <ModelAddButton /> : null}
       />
-    </Suspense>
-  </>
-)
-
+      <Suspense fallback={<SkeletonList />} key={search}>
+        <ModelList data={models ?? ([] as Model[])} />
+      </Suspense>
+    </>
+  );
 };
 
 export default ModelsPage;

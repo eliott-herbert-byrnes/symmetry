@@ -1,9 +1,9 @@
 "use server";
 
-import { createClient } from "@/lib/supabase/server";
+import { createActionClient } from "@/lib/supabase/server";
 
 export async function requestDemo() {
-  const supabase = await createClient();
+  const supabase = await createActionClient();
   const email = "demo@symmetryudn.com";
   const password = process.env.SUPABASE_DEMO_PASSWORD as string;
 

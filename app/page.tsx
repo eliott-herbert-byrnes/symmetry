@@ -41,7 +41,7 @@ export default async function Home({ searchParams }: HomeProps) {
   return (
     <div className="relative h-full w-full">
       <div className="absolute inset-0 z-0">
-        <ModelViewer url={modelUrl || "/diazene.pdb"} />
+        <ModelViewer url={modelUrl || "/allene.pdb"} />
       </div>
 
       <div className="absolute top-4 right-4 z-10 w-60 max-h-[calc(100vh-8rem)] overflow-y-auto">
