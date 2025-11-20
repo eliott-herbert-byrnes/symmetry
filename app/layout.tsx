@@ -6,14 +6,11 @@ import {
   SidebarTrigger,
   SidebarProvider,
 } from "@/components/ui/sidebar";
-import { Button } from "@/components/ui/button";
-import { LogInIcon } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { AppSidebar } from "@/components/app-sidebar";
 import { ThemeProvider } from "@/components/theme/theme-provider";
-import Link from "next/link";
-import { signInPath } from "./paths";
 import { AuthButtons } from "@/features/auth/components/auth-buttons";
+import { getProfile } from "@/lib/auth";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,11 +28,13 @@ export const metadata: Metadata = {
     "Symmetry is a platform for viewing 3D rendered molecules and crystal structures.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
+  const profile = await getProfile();
   return (
     <html lang="en" suppressHydrationWarning>
       <body
@@ -43,7 +42,7 @@ export default function RootLayout({
       >
         <ThemeProvider>
           <SidebarProvider defaultOpen={false}>
-            <AppSidebar />
+            <AppSidebar profile={profile} />
             <SidebarInset className="p-2">
               <div className="flex flex-col h-full rounded-lg p-4">
                 <div className="flex flex-row items-center gap-2 justify-between mb-2">
@@ -53,12 +52,6 @@ export default function RootLayout({
                     <h1 className="font-semibold ml-1.5">Symmetry</h1>
                   </div>
                   {/* buttons */}
-                  {/* <Button variant="outline" asChild>
-                    <Link href={signInPath()}>
-                      <LogInIcon />
-                      Sign In
-                    </Link>
-                  </Button> */}
                   <AuthButtons />
                 </div>
                 <Separator className="my-2" />

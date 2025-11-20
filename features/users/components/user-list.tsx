@@ -1,5 +1,5 @@
+/* eslint-disable react-hooks/incompatible-library */
 "use client";
-"use no memo";
 
 import * as React from "react";
 import {
@@ -42,6 +42,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
@@ -62,23 +63,19 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ModelDeleteButton } from "./model-delete-button";
+import { UserDeleteButton } from "./user-delete-button";
+import { UserRoleChangeButton } from "./user-role-change-button";
 
-export type Model = {
+export type UserProfile = {
   id: string;
-  name: string;
-  type: string;
-  formula: string;
-  molecular_weight: number;
-  symmetry: string;
-  space_group: string;
-  unit_cell: string;
-  unit_cell_angles: string;
-  description: string;
+  email: string;
+  full_name: string;
+  role: string;
   created_at: string;
+  updated_at: string;
 };
 
-function TableCellViewer({ item }: { item: Model }) {
+function TableCellViewer({ item }: { item: UserProfile }) {
   const isMobile = useIsMobile();
 
   return (
@@ -89,92 +86,30 @@ function TableCellViewer({ item }: { item: Model }) {
             variant="link"
             className="text-foreground w-fit px-0 text-left"
           >
-            {item.name}
+            {item.full_name}
           </Button>
         </SheetTrigger>
         <SheetContent side={isMobile ? "bottom" : "right"}>
-          <SheetHeader className="gap-1 mt-4">
-            <SheetTitle>{item.name}</SheetTitle>
-            <SheetDescription>Model Details</SheetDescription>
+          <SheetHeader className="gap-1">
+            <SheetTitle>{item.full_name}</SheetTitle>
+            <SheetDescription>User Details</SheetDescription>
           </SheetHeader>
-            <Separator />
           <div className="flex flex-col gap-4 overflow-y-auto py-4 text-sm mx-4">
             <div className="flex flex-col gap-2">
-              <Label className="font-semibold">Type</Label>
-              <p className="text-muted-foreground">{item.type}</p>
+              <Label className="font-semibold">Name</Label>
+              <p className="text-muted-foreground">{item.full_name}</p>
             </div>
 
             <Separator />
-
             <div className="flex flex-col gap-2">
-              <Label className="font-semibold">Formula</Label>
-              <p className="text-muted-foreground">{item.formula}</p>
+              <Label className="font-semibold">Email</Label>
+              <p className="text-muted-foreground">{item.email}</p>
             </div>
-
             <Separator />
-
-            <div className="flex flex-col gap-2">
-              <Label className="font-semibold">Molecular Weight</Label>
-              <p className="text-muted-foreground">{item.molecular_weight}</p>
-            </div>
-
-            <Separator />
-
-            <div className="flex flex-col gap-2">
-              <Label className="font-semibold">Symmetry</Label>
-              <p className="text-muted-foreground whitespace-pre-wrap">
-                {item.symmetry}
-              </p>
-            </div>
-
-            <Separator />
-
-            <div className="flex flex-col gap-2">
-              <Label className="font-semibold">Space Group</Label>
-              <p className="text-muted-foreground whitespace-pre-wrap">
-                {item.space_group}
-              </p>
-            </div>
-
-            <Separator />
-
-            <div className="flex flex-col gap-2">
-              <Label className="font-semibold">Unit Cell</Label>
-              <p className="text-muted-foreground whitespace-pre-wrap">
-                {item.unit_cell}
-              </p>
-            </div>
-
-            <Separator />
-
-            <div className="flex flex-col gap-2">
-              <Label className="font-semibold">Unit Cell Angles</Label>
-              <p className="text-muted-foreground whitespace-pre-wrap">
-                {item.unit_cell_angles}
-              </p>
-            </div>
-
-            <Separator />
-
-            <div className="flex flex-col gap-2">
-              <Label className="font-semibold">Description</Label>
-              <p className="text-muted-foreground whitespace-pre-wrap">
-                {item.description}
-              </p>
-            </div>
-
-            <Separator />
-
             <div className="flex flex-col gap-2">
               <Label className="font-semibold">Created At</Label>
               <p className="text-muted-foreground">
-                {new Date(item.created_at).toLocaleDateString("en-US", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
+                {item.created_at}
               </p>
             </div>
           </div>
@@ -189,10 +124,12 @@ function TableCellViewer({ item }: { item: Model }) {
   );
 }
 
-export function ModelList({
+export function UserList({
   data: initialData,
+  isAdmin,
 }: {
-  data: Model[];
+  data: UserProfile[] | null;
+  isAdmin: boolean;
 }) {
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] =
@@ -206,7 +143,7 @@ export function ModelList({
     pageSize: 10,
   });
 
-  const columns: ColumnDef<Model>[] = [
+  const columns: ColumnDef<UserProfile>[] = [
     {
       id: "select",
       header: ({ table }) => (
@@ -238,25 +175,35 @@ export function ModelList({
     {
       accessorKey: "name",
       header: "Name",
-      cell: ({ row }) => {
-        return <TableCellViewer item={row.original} />;
-      },
+      accessorFn: (row) => row.full_name,
+      cell: ({ row }) => <TableCellViewer item={row.original} />,
       enableHiding: false,
     },
     {
-      accessorKey: "type",
-      header: "Type",
+      accessorKey: "email",
+      header: "Email",
+      cell: ({ row }) => (
+        <div className="flex flex-col gap-2">
+          <p className="text-muted-foreground">{row.original.email}</p>
+        </div>
+      ),
+    },
+    {
+      accessorKey: "role",
+      header: "Role",
+      accessorFn: (row) => row.role,
       cell: ({ row }) => (
         <div className="w-32">
           <Badge variant="outline" className="text-muted-foreground px-1.5">
-            {row.original.type}
+            {row.original.role}
           </Badge>
         </div>
       ),
     },
     {
-      accessorKey: "created_at",
+      accessorKey: "createdAt",
       header: "Created At",
+      accessorFn: (row) => row.created_at,
       cell: ({ row }) => (
         <div className="text-sm text-muted-foreground">
           {new Date(row.original.created_at).toLocaleDateString("en-US", {
@@ -282,18 +229,25 @@ export function ModelList({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-40">
-            <DropdownMenuItem asChild>
-              <ModelDeleteButton modelId={row.original.id} />
-            </DropdownMenuItem>
+            {isAdmin && (
+              <>
+                <DropdownMenuItem asChild>
+                  <UserRoleChangeButton userId={row.original.id} currentRole={row.original.role} isAdmin={isAdmin}/>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <UserDeleteButton userId={row.original.id} isAdmin={isAdmin} />
+                </DropdownMenuItem>
+              </>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
       ),
     },
   ];
 
-  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
-    data: initialData,
+    data: initialData ?? [],
     columns,
     state: {
       sorting,
@@ -323,10 +277,8 @@ export function ModelList({
         <div className="relative flex-1 max-w-sm">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
-            placeholder="Search by model name..."
-            value={
-              (table.getColumn("name")?.getFilterValue() as string) ?? ""
-            }
+            placeholder="Search by user name or email..."
+            value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
             onChange={(event) =>
               table.getColumn("name")?.setFilterValue(event.target.value)
             }
@@ -378,7 +330,7 @@ export function ModelList({
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  No models found.
+                  No users found.
                 </TableCell>
               </TableRow>
             )}

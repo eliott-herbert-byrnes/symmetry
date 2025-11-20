@@ -1,4 +1,4 @@
-import { Box, ChevronUp, Home, User2, Waypoints } from "lucide-react";
+import { Box, ChevronUp, Home, User2, UserPlus, Waypoints } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -19,10 +19,9 @@ import {
 } from "./ui/dropdown-menu";
 import { ThemeSwitcher } from "./theme/theme-switcher";
 import { Fragment } from "react/jsx-runtime";
-import { homePath, modelsPath, signInPath } from "@/app/paths";
-import { getProfile, isAdmin } from "@/lib/auth";
+import { homePath, modelsPath, usersPath } from "@/app/paths";
+import { isAdmin, Profile } from "@/lib/auth";
 import { cn } from "@/lib/utils";
-import { redirect } from "next/navigation";
 
 const items = [
   {
@@ -39,25 +38,20 @@ const items = [
   },
   {
     title: "Userbase",
-    url: "/",
+    url: usersPath(),
     icon: User2,
     isAdmin: true,
   },
   {
     title: "Invite",
     url: "/",
-    icon: Box,
+    icon: UserPlus,
     isAdmin: true,
   },
 ];
 
-export async function AppSidebar() {
-  const profile = await getProfile();
-  if (!profile) {
-    redirect(signInPath());
-  }
-
-  const isAdminUser = isAdmin(profile);
+export function AppSidebar({ profile }: { profile: Profile | null }) {
+  const isAdminUser = profile ? isAdmin(profile) : false;
 
   return (
     <Sidebar collapsible="icon" variant="inset">

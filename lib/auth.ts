@@ -3,23 +3,29 @@ import { createClient } from "./supabase/server";
 
 export const getProfile = async () => {
   const supabase = await createClient();
+  
   const {
-    data: { session },
-  } = await supabase.auth.getSession();
-  if (!session) {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+  
+  if (userError || !user) {
     return null;
   }
+  
   const { data: profile, error } = await supabase
     .from("profiles")
     .select("*")
-    .eq("id", session.user.id)
+    .eq("id", user.id)
     .single();
+    
   if (error) {
     console.error("Error fetching profile:", error);
     return null;
   }
+  
   return {
-    user: session.user,
+    user: user,
     profile: profile,
   };
 };
