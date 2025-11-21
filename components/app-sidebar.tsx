@@ -19,7 +19,7 @@ import {
 } from "./ui/dropdown-menu";
 import { ThemeSwitcher } from "./theme/theme-switcher";
 import { Fragment } from "react/jsx-runtime";
-import { homePath, modelsPath, usersPath } from "@/app/paths";
+import { homePath, invitesPath, modelsPath, usersPath } from "@/app/paths";
 import { isAdmin, Profile } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 
@@ -44,7 +44,7 @@ const items = [
   },
   {
     title: "Invite",
-    url: "/",
+    url: invitesPath(),
     icon: UserPlus,
     isAdmin: true,
   },
