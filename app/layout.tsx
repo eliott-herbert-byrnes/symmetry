@@ -10,7 +10,10 @@ import { Separator } from "@/components/ui/separator";
 import { AppSidebar } from "@/components/app-sidebar";
 import { ThemeProvider } from "@/components/theme/theme-provider";
 import { AuthButtons } from "@/features/auth/components/auth-buttons";
+import { ShareButton } from "@/features/share/share-button";
 import { getProfile } from "@/lib/auth";
+import { Toaster } from "@/components/ui/sonner";
+import { Waypoints } from "lucide-react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,6 +29,9 @@ export const metadata: Metadata = {
   title: "Symmetry",
   description:
     "Symmetry is a platform for viewing 3D rendered molecules and crystal structures.",
+  icons: {
+    icon: "/favicon.svg",
+  },
 };
 
 export default async function RootLayout({
@@ -49,16 +55,19 @@ export default async function RootLayout({
                   <div className="flex flex-row items-center gap-2 h-4">
                     <SidebarTrigger />
                     <Separator orientation="vertical" className="h-4" />
-                    <h1 className="font-semibold ml-1.5">Symmetry</h1>
+                    <h1 className="font-semibold ml-1.5 flex flex-row items-center gap-2"> <Waypoints className="w-4 h-4" /> Symmetry</h1>
                   </div>
-                  {/* buttons */}
-                  <AuthButtons />
+                  <div className="flex flex-row items-center gap-2">
+                    <ShareButton />
+                    <AuthButtons />
+                  </div>
                 </div>
                 <Separator className="my-2" />
                 <div className="flex-1 overflow-hidden mt-2">{children}</div>
               </div>
             </SidebarInset>
           </SidebarProvider>
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>

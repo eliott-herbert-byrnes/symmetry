@@ -101,23 +101,25 @@ export function AppSidebar({ profile }: { profile: Profile | null }) {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
-        <SidebarMenu className="border-2 rounded-lg">
-          <SidebarMenuItem>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <SidebarMenuButton>
-                  <User2 /> {profile?.profile?.full_name ?? "Unknown"}
-                  <ChevronUp className="ml-auto" />
-                </SidebarMenuButton>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent side="top" className="">
-                <DropdownMenuItem>
-                  <ThemeSwitcher />
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </SidebarMenuItem>
-        </SidebarMenu>
+        {profile && (
+          <SidebarMenu className="border-2 rounded-lg">
+            <SidebarMenuItem>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <SidebarMenuButton>
+                    <User2 /> {profile.profile?.full_name ?? "User"}
+                    <ChevronUp className="ml-auto" />
+                  </SidebarMenuButton>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent side="top" className="">
+                  <DropdownMenuItem>
+                    <ThemeSwitcher />
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        )}
       </SidebarFooter>
     </Sidebar>
   );

@@ -20,7 +20,7 @@ export const getProfile = async () => {
     .single();
     
   if (error) {
-    console.error("Error fetching profile:", error);
+    console.log("Error fetching profile:", error);
     return null;
   }
   

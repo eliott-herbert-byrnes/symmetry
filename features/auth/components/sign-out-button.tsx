@@ -1,7 +1,6 @@
 "use client";
 import { useTransition } from "react";
 import { signOut } from "../actions/sign-out";
-import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { LogOutIcon, LucideLoaderCircle } from "lucide-react";
 
@@ -10,13 +9,8 @@ export function SignOutButton() {
 
   const handleSignOut = () => {
     startTransition(async () => {
-      try {
-        await signOut();
-        toast.success("Signed out successfully");
-      } catch (error) {
-        toast.error("Failed to sign out");
-        console.error("Failed to sign out:", error);
-      }
+
+      await signOut();
     });
   };
 

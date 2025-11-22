@@ -15,7 +15,7 @@ const Heading = ({
 }: HeadingProps) => {
   return (
     <>
-      <div className="p-2 flex flex-row justify-between">
+      <div className="p-2 flex flex-col justify-between sm:flex-row">
         <div className="flex flex-col gap-0.5">
           <h1 className="text-2xl font-bold">{title}</h1>
           <p className="text-sm text-muted-foreground">{description}</p>
@@ -23,7 +23,7 @@ const Heading = ({
             <div className="flex items-center gap-2 mt-1">{breadcrumbs}</div>
           )}
         </div>
-        {actions && <div className="flex items-center gap-2">{actions}</div>}
+        {actions && <div className="flex items-center gap-2 mt-4 sm:mt-0">{actions}</div>}
       </div>
       <Separator className="my-4" />
     </>

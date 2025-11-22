@@ -1,11 +1,27 @@
 "use client";
 
-import { Canvas } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
+import { Canvas, useThree } from "@react-three/fiber";
+import { OrbitControls, GizmoHelper, GizmoViewport } from "@react-three/drei";
 import { Card } from "@/components/ui/card";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, ElementRef } from "react";
 import * as THREE from "three";
 import { PDBLoader } from "three/addons/loaders/PDBLoader.js";
+import { Button } from "@/components/ui/button";
+import { 
+  RotateCcwIcon, 
+  EyeIcon, 
+  EyeOffIcon, 
+  CameraIcon 
+} from "lucide-react";
+import { toast } from "sonner";
+
+declare global {
+  interface Window {
+    __threeGL?: THREE.WebGLRenderer;
+    __threeScene?: THREE.Scene;
+    __threeCamera?: THREE.Camera;
+  }
+}
 
 const CPK_COLORS: { [key: string]: number } = {
   H: 0xffffff, // White
@@ -25,7 +41,7 @@ const CPK_COLORS: { [key: string]: number } = {
 function MoleculeModel({ url }: { url?: string }) {
   const groupRef = useRef<THREE.Group>(null);
   const [atoms, setAtoms] = useState<THREE.Group | null>(null);
-
+  
   useEffect(() => {
     const loader = new PDBLoader();
     loader.load(
@@ -40,7 +56,7 @@ function MoleculeModel({ url }: { url?: string }) {
         const json = pdb.json;
         const atomGeometry = new THREE.IcosahedronGeometry(1, 2);
 
-        type Atom = [number, number, number, string, string]; // [x, y, z, name, element]
+        type Atom = [number, number, number, string, string];
         (json.atoms as Atom[]).forEach((atom) => {
           const element = atom[4];
           const color = CPK_COLORS[element] || 0xffffff;
@@ -75,12 +91,156 @@ function MoleculeModel({ url }: { url?: string }) {
   return atoms ? <primitive object={atoms} ref={groupRef} /> : null;
 }
 
+function SceneSetup() {
+  const { gl, scene, camera } = useThree();
+
+  useEffect(() => {
+    window.__threeGL = gl;
+    window.__threeScene = scene;
+    window.__threeCamera = camera;
+    
+    return () => {
+      delete window.__threeGL;
+      delete window.__threeScene;
+      delete window.__threeCamera;
+    };
+  }, [gl, scene, camera]);
+
+  return null;
+}
+
+type ToolbarProps = {
+  onResetView: () => void;
+  showAxes: boolean;
+  setShowAxes: (show: boolean) => void;
+  onScreenshot: () => void;
+};
+
+function Toolbar({
+  onResetView,
+  showAxes,
+  setShowAxes,
+  onScreenshot,
+}: ToolbarProps) {
+  return (
+    <div className="absolute top-4 left-4 z-10 flex flex-col gap-2 bg-background/80 backdrop-blur-sm p-2 rounded-lg border shadow-lg">
+      {/* Reset View */}
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={onResetView}
+        className="justify-start"
+        title="Reset View"
+      >
+        <RotateCcwIcon className="h-4 w-4 mr-2" />
+        Reset
+      </Button>
+
+      {/* Toggle Axes */}
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => setShowAxes(!showAxes)}
+        className="justify-start"
+        title={showAxes ? "Hide Axes" : "Show Axes"}
+      >
+        {showAxes ? (
+          <>
+            <EyeOffIcon className="h-4 w-4 mr-2" />
+            Hide Axes
+          </>
+        ) : (
+          <>
+            <EyeIcon className="h-4 w-4 mr-2" />
+            Show Axes
+          </>
+        )}
+      </Button>
+
+      {/* Screenshot */}
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={onScreenshot}
+        className="justify-start"
+        title="Take Screenshot"
+      >
+        <CameraIcon className="h-4 w-4 mr-2" />
+        Screenshot
+      </Button>
+    </div>
+  );
+}
+
 export default function ModelViewer({ url }: { url?: string }) {
   const pdbFile = url || "/diazene.pdb";
+  const controlsRef = useRef<ElementRef<typeof OrbitControls>>(null);
+  
+  // Toolbar states
+  const [showAxes, setShowAxes] = useState(false);
+  
+  // Initial camera position
+  const initialCameraPosition: [number, number, number] = [0, 0, 90];
+  const initialTarget: [number, number, number] = [0, 0, 0];
+
+  const handleResetView = () => {
+    if (controlsRef.current) {
+      // Reset camera position
+      controlsRef.current.object.position.set(...initialCameraPosition);
+      controlsRef.current.target.set(...initialTarget);
+      controlsRef.current.update();
+      toast.success("View reset");
+    }
+  };
+
+  const handleScreenshot = () => {
+    const gl = window.__threeGL;
+    const scene = window.__threeScene;
+    const camera = window.__threeCamera;
+    
+    if (gl && scene && camera) {
+      try {
+        gl.render(scene, camera);
+        
+        const canvas = gl.domElement;
+        
+        canvas.toBlob((blob: Blob | null) => {
+          if (blob) {
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = `molecule-${Date.now()}.png`;
+            link.click();
+            URL.revokeObjectURL(url);
+            toast.success("Screenshot saved");
+          } else {
+            toast.error("Failed to create screenshot");
+          }
+        }, "image/png");
+      } catch (error) {
+        console.error("Screenshot error:", error);
+        toast.error("Failed to capture screenshot");
+      }
+    } else {
+      toast.error("Canvas not ready");
+    }
+  };
 
   return (
-    <Card className="bg-transparent h-full w-full">
-      <Canvas camera={{ position: [0, 0, 90], fov: 10 }}>
+    <Card className="bg-transparent h-full w-full relative">
+      <Toolbar
+        onResetView={handleResetView}
+        showAxes={showAxes}
+        setShowAxes={setShowAxes}
+        onScreenshot={handleScreenshot}
+      />
+      
+      <Canvas 
+        camera={{ position: initialCameraPosition, fov: 10 }}
+        gl={{ preserveDrawingBuffer: true }}
+      >
+        <SceneSetup />
+        
         <ambientLight intensity={0.3} />
         <directionalLight position={[10, 10, 10]} intensity={0.8} />
         <directionalLight position={[-10, -10, -10]} intensity={0.4} />
@@ -88,7 +248,18 @@ export default function ModelViewer({ url }: { url?: string }) {
 
         <MoleculeModel url={pdbFile} />
 
+        {/* Axes Helper */}
+        {showAxes && (
+          <GizmoHelper alignment="bottom-right" margin={[80, 80]}>
+            <GizmoViewport 
+              axisColors={['#ff0000', '#00ff00', '#0000ff']} 
+              labelColor="white"
+            />
+          </GizmoHelper>
+        )}
+
         <OrbitControls
+          ref={controlsRef}
           autoRotate
           autoRotateSpeed={1}
           enableDamping

@@ -63,6 +63,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { ModelDeleteButton } from "./model-delete-button";
+import { ModelEditButton } from "./model-edit-button";
 
 export type Model = {
   id: string;
@@ -282,6 +283,9 @@ export function ModelList({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-40">
+            <DropdownMenuItem asChild>
+              <ModelEditButton model={row.original} />
+            </DropdownMenuItem>
             <DropdownMenuItem asChild>
               <ModelDeleteButton modelId={row.original.id} />
             </DropdownMenuItem>
