@@ -17,7 +17,7 @@ export async function AuthButtons() {
   return (
     <>
       {!signedIn ? (
-        <Button variant="outline" asChild>
+        <Button variant="outline" size="sm" asChild>
           <Link href={signInPath()}>
             <LogInIcon />
             Sign In

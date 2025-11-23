@@ -43,7 +43,7 @@ export function ShareButton() {
   };
 
   return (
-    <Button variant="outline" size="default" onClick={handleShare}>
+    <Button variant="outline" size="sm" onClick={handleShare}>
       {copied ? (
         <CheckIcon className="h-4 w-4 text-green-500" />
       ) : (
