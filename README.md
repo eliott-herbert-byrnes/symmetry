@@ -871,8 +871,6 @@ Nantes Université, Physics Department | 2022
 Worked with the research team to develop an accessible web-based tool for visualising complex molecular and crystal structures. The project addressed the need for a platform-independent solution that didn't require expensive commercial software licenses.
 
 **Key Achievements:**
-- Delivered fully functional web application within 6-month placement
-- Received distinction grade for technical implementation and documentation
 - Application adopted by physics department for undergraduate teaching
 - Positive feedback from faculty and students on usability
 
