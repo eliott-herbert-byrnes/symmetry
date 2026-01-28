@@ -1,4 +1,4 @@
-import { supabase } from "@/lib/supabase/client";
+import { createClient } from "@/lib/supabase/server";
 import { Suspense } from "react";
 import { SkeletonList } from "@/components/skeleton-list";
 import { Heading } from "@/components/heading";
@@ -21,6 +21,7 @@ const ModelsPage = async ({ searchParams }: ModelPageProps) => {
     redirect(signInPath());
   }
 
+  const supabase = await createClient();
   const isAdminUser = isAdmin(profile);
 
   const params = await searchParams;
