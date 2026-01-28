@@ -14,7 +14,7 @@ export async function createClient() {
           return cookieStore.getAll();
         },
         setAll(cookiesToSet) {
-            // console.log("Setting cookies:", cookiesToSet);
+            console.log("Setting cookies:", cookiesToSet);
         },
       },
     }
