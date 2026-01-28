@@ -36,12 +36,12 @@ const items = [
     icon: Box,
     isAdmin: false,
   },
-  {
-    title: "Userbase",
-    url: usersPath(),
-    icon: User2,
-    isAdmin: true,
-  },
+  // {
+  //   title: "Userbase",
+  //   url: usersPath(),
+  //   icon: User2,
+  //   isAdmin: true,
+  // },
   {
     title: "Invite",
     url: invitesPath(),
