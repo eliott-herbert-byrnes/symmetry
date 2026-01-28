@@ -1,4 +1,4 @@
-import { supabase } from "@/lib/supabase/client";
+import { createClient } from "@/lib/supabase/server";
 import ControlPanel from "@/features/control-panel/components/control-panel";
 import ModelViewer from "@/features/models/components/model-viewer";
 
@@ -9,6 +9,7 @@ type HomeProps = {
 };
 
 export default async function Home({ searchParams }: HomeProps) {
+  const supabase = await createClient();
   const params = await searchParams;
   const modelId = params.modelId;
 
